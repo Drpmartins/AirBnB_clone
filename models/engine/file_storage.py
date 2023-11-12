@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Defining the FileStorage class."""
+"""Defines the FileStorage class."""
 import json
 from models.base_model import BaseModel
 from models.user import User
@@ -11,8 +11,7 @@ from models.review import Review
 
 
 class FileStorage:
-    """Representing an abstracted storage engine.
-
+    """Represent an abstracted storage engine.
     Attributes:
         __file_path (str): The name of the file to save objects to.
         __objects (dict): A dictionary of instantiated objects.
@@ -41,9 +40,19 @@ class FileStorage:
         try:
             with open(FileStorage.__file_path) as f:
                 objdict = json.load(f)
+                class_map = {
+                    "BaseModel": BaseModel,
+                    "User": User,
+                    "State": State,
+                    "City": City,
+                    "Place": Place,
+                    "Amenity": Amenity,
+                    "Review": Review
+                }
                 for o in objdict.values():
                     cls_name = o["__class__"]
                     del o["__class__"]
-                    self.new(eval(cls_name)(**o))
+                    if cls_name in class_map:
+                        self.new(class_map[cls_name](**o))
         except FileNotFoundError:
             return
